@@ -1,0 +1,1 @@
+ // transformar comandos antes de enviar
