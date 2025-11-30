@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { AppColors } from '@theme/Colors'; 
-import SpecieCard from '@components/SpecieCard'; // Importamos el componente modularizado
+import SpecieCard from '@components/SpecieCard';
 
-// --- TIPADO Y DATOS (Definidos aquí, donde se gestiona la lista) ---
 type PlantStage = 'Reproductivo' | 'Crecimiento' | 'Maduración';
 type PlantZone = 'Zona A' | 'Zona B' | 'Zona C';
 
@@ -19,7 +18,6 @@ interface PlantData {
     color: string;
 }
 
-// Datos Mock con el campo de Zona
 const mockSpecies: PlantData[] = [
     {
         id: 1, name: 'Tomate', scientificName: 'Solanum lycopersicum', count: 120,
@@ -43,28 +41,20 @@ const mockSpecies: PlantData[] = [
     },
     {
         id: 5, name: 'Papa', scientificName: 'Solanum tuberosum', count: 70,
-        stage: 'Crecimiento', zone: 'Zona C', isCritical: false,
+        stage: 'Crecimiento', zone: 'Zona B', isCritical: false,
         imageUrl: 'https://placehold.co/60x60/C0C0C0/333333?text=P', color: AppColors.LIGHT_COLOR,
     },
 ];
 
-// Componente principal de la lista con la cabecera de filtros
 const ListSpecies = () => {
-    // Estado para gestionar la pestaña activa (Todo, Zona A, Zona B, etc.)
     const [activeTab, setActiveTab] = useState<'Todo' | PlantZone>('Todo'); 
-    
-    // Lista de pestañas para el filtro
-    const tabs: Array<'Todo' | PlantZone> = ['Todo', 'Zona A', 'Zona B', 'Zona C'];
-
-    // Lógica de Filtrado
+    const tabs: Array<'Todo' | PlantZone> = ['Todo', 'Zona A', 'Zona B'];
     const filteredSpecies = mockSpecies.filter(plant => {
         if (activeTab === 'Todo') {
             return true;
         }
         return plant.zone === activeTab;
     });
-
-    // Función para renderizar la cabecera de pestañas (Tabs)
     const renderTabHeader = () => (
         <ScrollView 
             horizontal 
