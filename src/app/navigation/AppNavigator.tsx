@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import ConnectionScreen from "@screens/ConnectionScreen";
 import DashboardScreen from "@screens/DashboardScreen";
 import ControlScreen from "@screens/ControlScreen";
-import HistoryScreen from "@screens/HistoryScreen";
+import SyncScreen from "@screens/SyncScreen";
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
@@ -55,7 +55,7 @@ const AppNavigator = () => {
       />
       <Tab.Screen
         name="Data"
-        component={HistoryScreen}
+        component={SyncScreen}
         options={{ title: "Nube" }}
       />
       <Tab.Screen
