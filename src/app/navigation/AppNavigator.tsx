@@ -3,49 +3,39 @@ import { RootTabParamList } from "./types";
 import { AppColors } from "@theme/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import ConnectionScreen from "@screens/ConnectionScreen";
-import DashboardScreen from "@screens/DashboardScreen";
 import ControlScreen from "@screens/ControlScreen";
 import SyncScreen from "@screens/SyncScreen";
+import HomeStack from "./HomeStack";
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 const AppNavigator = () => {
+  const { PRIMARY_COLOR, TEXT_GRAY, WHITE, BLACK } = AppColors;
   return (
     <Tab.Navigator
-      initialRouteName="Dashboard"
+      initialRouteName="Home"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap = "help";
-          if (route.name === "Dashboard") {
+          if (route.name === "Home") {
             iconName = focused ? "speedometer" : "speedometer-outline";
           } else if (route.name === "Control") {
             iconName = focused ? "water" : "water-outline";
           } else if (route.name === "Data") {
-            iconName = focused ? "cloud" : "cloud-outline";
+            iconName = focused ? "cloud-upload" : "cloud-upload-outline";
           } else if (route.name === "Connectivity") {
             iconName = focused ? "wifi" : "wifi-outline";
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: AppColors.PRIMARY_COLOR,
+        tabBarActiveTintColor: PRIMARY_COLOR,
         tabBarInactiveTintColor: AppColors.TEXT_GRAY,
         headerShown: false,
-        tabBarStyle: {
-          paddingVertical: 5,
-          height: 60,
-          backgroundColor: AppColors.WHITE,
-          borderTopWidth: 0,
-          shadowColor: AppColors.BLACK,
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.05,
-          shadowRadius: 4,
-          elevation: 5,
-        },
       })}
     >
       <Tab.Screen
-        name="Dashboard"
-        component={DashboardScreen}
+        name="Home"
+        component={HomeStack}
         options={{ title: "Monitoreo" }}
       />
       <Tab.Screen
