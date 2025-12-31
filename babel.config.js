@@ -20,6 +20,7 @@ module.exports = function (api) {
             "@config": "./src/core/config",
             "@utils": "./src/core/utils",
             "@constants": "./src/core/constants",
+            "@errors": "./src/core/errors",
             "@types": "./src/core/types",
             "@custom-hooks/*": "./src/hooks",
             "@redux/*": "./src/redux",

@@ -16,6 +16,7 @@
       "@config/*": ["core/config/*"],
       "@utils/*": ["core/utils/*"],
       "@constants/*": ["core/constants/*"],
+      "@errors/*": ["core/errors/*"],
       "@types/*": ["core/types/*"],
       "@custom-hooks/*": ["hooks/*"],
       "@redux/*": ["redux/*"]
