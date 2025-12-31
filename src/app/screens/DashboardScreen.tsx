@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context'; 
 import { AppColors } from '@theme/Colors';
@@ -9,6 +9,8 @@ import { CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { HomeStackParamList, RootTabParamList } from '@navigation/types';
+import { useConnectionGuard } from '@custom-hooks/logic/useConnectionGuard';
+import { useRealTimeStatus } from '@custom-hooks/logic/useRealTimeStatus';
 
 type DashboardScreenNavigationProp = CompositeNavigationProp<
     StackNavigationProp<HomeStackParamList, 'HomeDashboard'>,
@@ -16,37 +18,7 @@ type DashboardScreenNavigationProp = CompositeNavigationProp<
 >;
 
 const { width } = Dimensions.get('window');
-const GRID_ITEM_WIDTH = (width - 60) / 3; 
-
-const mockData = {
-    connectionStatus: 'CONECTADO', 
-    lastTimestamp: '2024-07-26 10:30 AM', 
-    humedadZonaA: 3250,
-    estadoA: 'Mojado',
-    litrosZonaA: 0.5,
-    humedadZonaB: 1500,
-    estadoB: 'Seco', 
-    litrosZonaB: 12.0,
-    consumoTotal: 12.5, 
-    humedadPromedio: 65,
-};
-interface EnvironmentalData {
-    temperature: number | null; 
-    airHumidity: number | null; 
-    co2: number | null;         
-    soilMoisture: number | null; 
-    light: number | null; 
-    species: number | null; 
-}
-
-const mockEnvironmentalData: EnvironmentalData = {
-    temperature: 28.4,
-    airHumidity: 55,
-    co2: 500, 
-    soilMoisture: 3500,
-    light: 12000,
-    species: 4,
-};
+const GRID_ITEM_WIDTH = (width - 60) / 3;
 
 const environmentalSensors = [
     { key: 'temperature', label: 'Temperatura', unit: '°C', icon: 'thermometer-outline' },
@@ -59,43 +31,40 @@ const environmentalSensors = [
 
 const DashboardScreen = () => {
     const navigation = useNavigation<DashboardScreenNavigationProp>();
-    const { 
-        PRIMARY_COLOR, DARK_COLOR, TEXT_GRAY, WHITE, 
-        LIGHT_COLOR, SECUNDARY_COLOR 
-    } = AppColors;
+    const { PRIMARY_COLOR, WHITE } = AppColors;
+    const { isConnected, checkNetwork } = useConnectionGuard();
+    const { data, loading } = useRealTimeStatus(isConnected ? 15000 : 0);
+    const realTimeData = data.length > 0 ? data[0] : null;
+
+    const currentEnvData = {
+        temperature: isConnected ? realTimeData?.temperatura ?? 0 : null,
+        airHumidity: isConnected ? realTimeData?.humedadAmbiente ?? 0 : null,
+        co2: isConnected ? realTimeData?.co2 ?? 0 : null,
+        soilMoisture: isConnected ? realTimeData?.humedadSuelo ?? 0 : null,
+        light: isConnected ? realTimeData?.lux ?? 0 : null,
+        species: 4, 
+    };
 
     const renderConditionPill = (
         iconName: keyof typeof Ionicons.glyphMap, 
         label: string, 
         value: string | number | null, 
         unit: string,
-        metricKey: keyof EnvironmentalData
+        metricKey: string
     ) => {
-        const isAvailable = value !== null;
+        const isAvailable = value !== null && isConnected;
         const displayValue = isAvailable ? `${value}${unit}` : 'N/D';
         const displayLabel = isAvailable ? label : 'No disponible';
-        const handlePress = () => {
-            if (isAvailable) {
-                navigation.navigate('Home', { 
-                    screen: 'Stats',  
-                    params: {
-                        metricName: label,
-                        metricUnit: unit.trim(),
-                        metricKey: metricKey,
-                    }
-                });
-            }
-        };
 
         return (
             <TouchableOpacity 
                 key={metricKey}
                 style={styles.conditionItem} 
-                onPress={handlePress}
+                onPress={() => isAvailable && navigation.navigate('Home', { screen: 'Stats', params: { metricName: label, metricUnit: unit.trim(), metricKey: metricKey }})}
                 disabled={!isAvailable}
             >
                 <View style={styles.conditionIconArea}>
-                    <Ionicons name={iconName} size={30} color={AppColors.PRIMARY_COLOR} />
+                    <Ionicons name={iconName} size={30} color={PRIMARY_COLOR} />
                 </View>
                 <Text style={styles.conditionLabel}>{displayLabel}</Text>
                 <Text style={styles.conditionValue}>{displayValue}</Text>
@@ -107,35 +76,38 @@ const DashboardScreen = () => {
         <SafeAreaView style={styles.safeArea}>
             <ScrollView style={styles.scrollViewContent}>
                 <View style={styles.header}>
-                    <View style={styles.tagPill}>
+                    <View style={[styles.tagPill, { backgroundColor: isConnected ? '#4CAF50' : '#F44336' }]}>
                         <Ionicons 
-                            name={mockData.connectionStatus === 'CONECTADO' ? "checkmark-circle" : "close-circle"} 
+                            name={isConnected ? "checkmark-circle" : "close-circle"} 
                             size={14} 
                             color={WHITE} 
                             style={{ marginRight: 5 }}
                         />
-                        <Text style={styles.tagText}>{mockData.connectionStatus}</Text>
+                        <Text style={styles.tagText}>{isConnected ? 'CONECTADO' : 'DESCONECTADO'}</Text>
                     </View>
                     <Text style={styles.lastUpdateText}>
-                        Última Act.: {mockData.lastTimestamp}
+                        {isConnected ? `Última Act.: ${new Date().toLocaleTimeString()}` : 'Sin conexión a SIIT40'}
                     </Text>
-                </View>                
+                </View>
+
                 <Text style={styles.mainTitle}>SIIT40</Text>
                 <View style={styles.subtitleRow}>
                     <Text style={styles.mainSubtitle}>Sistema de invernadero inteligente con tecnología 4.0</Text>
                 </View>
-                <Text style={styles.sectionTitle}>Sensores y ambiente</Text>                
+
+                <Text style={styles.sectionTitle}>Sensores y ambiente</Text>
                 <View style={styles.conditionsGrid}>
                     {environmentalSensors.map((sensor) => (
                         renderConditionPill(
-                            sensor.icon as keyof typeof Ionicons.glyphMap,
+                            sensor.icon as any,
                             sensor.label,
-                            mockEnvironmentalData[sensor.key as keyof EnvironmentalData],
+                            currentEnvData[sensor.key as keyof typeof currentEnvData],
                             sensor.unit,
-                            sensor.key as keyof EnvironmentalData
+                            sensor.key
                         )
                     ))}
                 </View>
+
                 <Text style={styles.sectionTitle}>Especies</Text>
                 <View style={styles.speciesListContainer}>
                     <ListSpecies />
