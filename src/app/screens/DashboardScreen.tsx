@@ -90,8 +90,8 @@ const DashboardScreen = () => {
                 <View style={styles.subtitleRow}>
                     <Text style={styles.mainSubtitle}>Sistema de invernadero inteligente con tecnología 4.0</Text>
                 </View>
-                <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>Sensores y ambiente</Text>
+                <View style={styles.sectionSubtitle}>
+                    <Text style={styles.subTitle}>Sensores y ambiente</Text>
                     {/* <TouchableOpacity 
                         style={styles.historyButton} 
                         onPress={() => navigation.navigate('History')}
@@ -111,7 +111,16 @@ const DashboardScreen = () => {
                         )
                     ))}
                 </View>
-                <Text style={styles.sectionTitle}>Especies</Text>
+                <View style={styles.sectionSubtitle}>
+                    <Text style={styles.subTitle}>Especies</Text>
+                    <TouchableOpacity 
+                        onPress={() => navigation.navigate('Config')}
+                        style={styles.configButton}
+                    >
+                        <Ionicons name="settings-outline" size={22} color={AppColors.PRIMARY_COLOR} />
+                        <Text style={styles.configButtonText}>Gestionar</Text>
+                    </TouchableOpacity>
+                </View>
                 <View style={styles.speciesListContainer}>
                     <ListSpecies />
                 </View>
@@ -221,13 +230,10 @@ const styles = StyleSheet.create({
         marginTop: 2,
         color: AppColors.PRIMARY_COLOR
     },
-    sectionTitle: {
+    subTitle: {
         fontSize: 17,
         fontWeight: '600',
         color: AppColors.DARK_COLOR,
-        marginTop: 5,
-        marginBottom: 15,
-        paddingHorizontal: 20,
     },
     speciesListContainer: {
         flex: 1,
@@ -269,4 +275,21 @@ const styles = StyleSheet.create({
         color: AppColors.PRIMARY_COLOR,
         marginRight: 2,
     },
+    configButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    configButtonText: {
+        marginLeft: 5,
+        color: AppColors.PRIMARY_COLOR,
+        fontWeight: '600',
+    },
+    sectionSubtitle:{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 5,
+        marginBottom: 15,
+        paddingHorizontal: 20,
+    }
 });
