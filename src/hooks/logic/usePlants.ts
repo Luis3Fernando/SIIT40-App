@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PlantData } from '@models/PlantData';
-import { getPlantsFromCloud } from '@services/plantService';
+import { getGreenhousePlants } from '@services/plantService';
 
 const STORAGE_KEY = '@plants_inventory_cache';
 
@@ -12,7 +12,7 @@ export const usePlants = () => {
     const loadData = useCallback(async () => {
         setLoading(true);
         
-        const cloudData = await getPlantsFromCloud();
+        const cloudData = await getGreenhousePlants();
 
         if (cloudData) {
             setPlants(cloudData);

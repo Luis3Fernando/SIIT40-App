@@ -1,18 +1,27 @@
 import { ENV } from '@config/environments';
-import { PlantData } from '@models/PlantData';
+import { PlantData, Species } from '@models/PlantData';
 
-const RESOURCE = '/plants-greenhouse';
+const ENDPOINTS = {
+    GREENHOUSE: '/plants-greenhouse/me',
+    CATALOG: '/plants-catalog',
+};
 
-export const getPlantsFromCloud = async (): Promise<PlantData[] | null> => {
+export const getGreenhousePlants = async (): Promise<PlantData[] | null> => {
     try {
-        const response = await fetch(`${ENV.API_URL}${RESOURCE}`);
-        
-        if (!response.ok) return null;
-        
-        const data = await response.json();
-        return data;
+        const response = await fetch(`${ENV.API_URL}${ENDPOINTS.GREENHOUSE}`);
+        return response.ok ? await response.json() : null;
     } catch (error) {
-        console.log(`[Service Error] Fallo al conectar con ${RESOURCE}. Modo offline activado.`);
+        console.log("[Service] Error en Greenhouse API. Modo offline.");
+        return null;
+    }
+};
+
+export const getAllSpecies = async (): Promise<Species[] | null> => {
+    try {
+        const response = await fetch(`${ENV.API_URL}${ENDPOINTS.CATALOG}`);
+        return response.ok ? await response.json() : null;
+    } catch (error) {
+        console.log("[Service] Error en Catalog API. Modo offline.");
         return null;
     }
 };
