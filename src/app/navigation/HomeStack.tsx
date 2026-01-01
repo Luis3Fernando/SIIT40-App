@@ -1,10 +1,10 @@
 import React from 'react';
-// Debes instalar esta dependencia: npm install @react-navigation/stack
 import { createStackNavigator } from '@react-navigation/stack'; 
 import { HomeStackParamList } from './types';
 import DashboardScreen from '@screens/DashboardScreen';
 import StatsScreen from '@screens/StatsScreen';
 import { AppColors } from '@theme/Colors';
+import HistoryScreen from '@screens/HistoryScreen';
 
 const Stack = createStackNavigator<HomeStackParamList>();
 
@@ -21,7 +21,7 @@ const HomeStack = () => {
         },
         headerTitleStyle: {
           fontWeight: '700',
-          color: AppColors.DARK_COLOR,
+          color: AppColors.PRIMARY_COLOR,
         },
         headerTintColor: AppColors.PRIMARY_COLOR,
       }}
@@ -31,14 +31,17 @@ const HomeStack = () => {
         component={DashboardScreen} 
         options={{ title: 'Monitoreo', headerShown: false }} 
       />
-      
-      {/* Registramos la pantalla Stats, lista para recibir parámetros */}
       <Stack.Screen 
         name="Stats" 
         component={StatsScreen} 
         options={({ route }) => ({
           title: route.params.metricName, 
         })}
+      />
+      <Stack.Screen 
+        name="History" 
+        component={HistoryScreen} 
+        options={{ title: "Historial" }}
       />
     </Stack.Navigator>
   );

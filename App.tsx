@@ -1,5 +1,5 @@
 import React from 'react';
-import { StatusBar } from 'expo-status-bar';
+import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './src/app/navigation/AppNavigator';
 import { SafeAreaProvider } from 'react-native-safe-area-context'; 
@@ -14,7 +14,7 @@ export default function App() {
         <ConnectionManager />
         <NavigationContainer>
           <AppNavigator />
-          <StatusBar style="auto" /> 
+          <StatusBar barStyle="light-content"/> 
         </NavigationContainer>
       </SafeAreaProvider>
     </Provider>

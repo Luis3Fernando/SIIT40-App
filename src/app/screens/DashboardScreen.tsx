@@ -89,13 +89,20 @@ const DashboardScreen = () => {
                         {isConnected ? `Última Act.: ${new Date().toLocaleTimeString()}` : 'Sin conexión a SIIT40'}
                     </Text>
                 </View>
-
                 <Text style={styles.mainTitle}>SIIT40</Text>
                 <View style={styles.subtitleRow}>
                     <Text style={styles.mainSubtitle}>Sistema de invernadero inteligente con tecnología 4.0</Text>
                 </View>
-
-                <Text style={styles.sectionTitle}>Sensores y ambiente</Text>
+                <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>Sensores y ambiente</Text>
+                    <TouchableOpacity 
+                        style={styles.historyButton} 
+                        onPress={() => navigation.navigate('History')}
+                    >
+                        <Text style={styles.historyButtonText}>Ver historial</Text>
+                        <Ionicons name="chevron-forward" size={16} color={PRIMARY_COLOR} />
+                    </TouchableOpacity>
+                </View>
                 <View style={styles.conditionsGrid}>
                     {environmentalSensors.map((sensor) => (
                         renderConditionPill(
@@ -246,5 +253,24 @@ const styles = StyleSheet.create({
     placeholderText: {
         color: AppColors.DARK_COLOR,
         fontWeight: 'bold',
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    historyButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 20,
+        backgroundColor: AppColors.WHITE, 
+    },
+    historyButtonText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: AppColors.PRIMARY_COLOR,
+        marginRight: 2,
     },
 });

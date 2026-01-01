@@ -7,6 +7,7 @@ export type HomeStackParamList = {
     metricUnit: string;
     metricKey: string;
   };
+  History: undefined;
 };
 
 export type RootTabParamList = {
