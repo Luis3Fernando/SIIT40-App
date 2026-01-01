@@ -31,18 +31,17 @@ const environmentalSensors = [
 
 const DashboardScreen = () => {
     const navigation = useNavigation<DashboardScreenNavigationProp>();
-    const { PRIMARY_COLOR, WHITE } = AppColors;
-    const { isConnected, checkNetwork } = useConnectionGuard();
-    const { data, loading } = useRealTimeStatus(isConnected ? 15000 : 0);
-    const realTimeData = data.length > 0 ? data[0] : null;
+    const { PRIMARY_COLOR, WHITE, DARK_COLOR } = AppColors;
+    const { isConnected } = useConnectionGuard();
+    const { data: averagedData, loading } = useRealTimeStatus(isConnected ? 15000 : 0);
 
     const currentEnvData = {
-        temperature: isConnected ? realTimeData?.temperatura ?? 0 : null,
-        airHumidity: isConnected ? realTimeData?.humedadAmbiente ?? 0 : null,
-        co2: isConnected ? realTimeData?.co2 ?? 0 : null,
-        soilMoisture: isConnected ? realTimeData?.humedadSuelo ?? 0 : null,
-        light: isConnected ? realTimeData?.lux ?? 0 : null,
-        species: 4, 
+        temperature: averagedData?.temperature ?? null,
+        airHumidity: averagedData?.airHumidity ?? null,
+        co2: averagedData?.co2 ?? null,
+        soilMoisture: averagedData?.soilMoisture ?? null,
+        light: averagedData?.light ?? null,
+        species: averagedData?.species ?? 4, 
     };
 
     const renderConditionPill = (
@@ -52,21 +51,19 @@ const DashboardScreen = () => {
         unit: string,
         metricKey: string
     ) => {
-        const isAvailable = value !== null && isConnected;
+        const isAvailable = isConnected && value !== null;
         const displayValue = isAvailable ? `${value}${unit}` : 'N/D';
-        const displayLabel = isAvailable ? label : 'No disponible';
 
         return (
             <TouchableOpacity 
                 key={metricKey}
                 style={styles.conditionItem} 
-                onPress={() => isAvailable && navigation.navigate('Home', { screen: 'Stats', params: { metricName: label, metricUnit: unit.trim(), metricKey: metricKey }})}
                 disabled={!isAvailable}
             >
                 <View style={styles.conditionIconArea}>
                     <Ionicons name={iconName} size={30} color={PRIMARY_COLOR} />
                 </View>
-                <Text style={styles.conditionLabel}>{displayLabel}</Text>
+                <Text style={styles.conditionLabel}>{label}</Text>
                 <Text style={styles.conditionValue}>{displayValue}</Text>
             </TouchableOpacity>
         );
@@ -86,7 +83,7 @@ const DashboardScreen = () => {
                         <Text style={styles.tagText}>{isConnected ? 'CONECTADO' : 'DESCONECTADO'}</Text>
                     </View>
                     <Text style={styles.lastUpdateText}>
-                        {isConnected ? `Última Act.: ${new Date().toLocaleTimeString()}` : 'Sin conexión a SIIT40'}
+                        {isConnected ? `Última Act: ${new Date().toLocaleTimeString()}` : 'Sin conexión a SIIT40'}
                     </Text>
                 </View>
                 <Text style={styles.mainTitle}>SIIT40</Text>
@@ -95,13 +92,13 @@ const DashboardScreen = () => {
                 </View>
                 <View style={styles.sectionHeader}>
                     <Text style={styles.sectionTitle}>Sensores y ambiente</Text>
-                    <TouchableOpacity 
+                    {/* <TouchableOpacity 
                         style={styles.historyButton} 
                         onPress={() => navigation.navigate('History')}
                     >
                         <Text style={styles.historyButtonText}>Ver historial</Text>
                         <Ionicons name="chevron-forward" size={16} color={PRIMARY_COLOR} />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
                 <View style={styles.conditionsGrid}>
                     {environmentalSensors.map((sensor) => (
@@ -114,7 +111,6 @@ const DashboardScreen = () => {
                         )
                     ))}
                 </View>
-
                 <Text style={styles.sectionTitle}>Especies</Text>
                 <View style={styles.speciesListContainer}>
                     <ListSpecies />

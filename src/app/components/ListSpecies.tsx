@@ -41,7 +41,7 @@ const mockSpecies: PlantData[] = [
     },
     {
         id: 5, name: 'Papa', scientificName: 'Solanum tuberosum', count: 70,
-        stage: 'Crecimiento', zone: 'Zona B', isCritical: false,
+        stage: 'Crecimiento', zone: 'Zona B', isCritical: true,
         imageUrl: 'https://placehold.co/60x60/C0C0C0/333333?text=P', color: AppColors.LIGHT_COLOR,
     },
 ];

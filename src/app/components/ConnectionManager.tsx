@@ -9,7 +9,10 @@ export const ConnectionManager = () => {
   useEffect(() => {
     const subscription = Network.addNetworkStateListener(state => {
       const isWiFi = state.type === Network.NetworkStateType.WIFI;
-      if (!state.isConnected || !isWiFi) {
+      
+      if (isWiFi) {
+        dispatch(setConnectionInfo({ ssid: 'WIFI_DETECTED', isSIIT40: true }));
+      } else {
         dispatch(setConnectionInfo({ ssid: null, isSIIT40: false }));
       }
     });
