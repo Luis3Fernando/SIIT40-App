@@ -1,72 +1,58 @@
-import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { AppColors } from '@theme/Colors'; 
-
-// --- Tipado necesario para que la tarjeta sea independiente ---
-type PlantStage = 'Reproductivo' | 'Crecimiento' | 'Maduración';
-type PlantZone = 'Zona A' | 'Zona B' | 'Zona C';
-
-interface PlantData {
-    id: number;
-    name: string;
-    scientificName: string;
-    count: number;
-    stage: PlantStage;
-    zone: PlantZone;
-    isCritical: boolean;
-    imageUrl: string;
-    color: string;
-}
+import { AppColors } from '@theme/Colors';
+import { PlantData } from '@models/PlantData';
 
 interface SpecieCardProps {
     item: PlantData;
     onPress: () => void;
 }
 
-// Componente individual de la Tarjeta de Especie
 const SpecieCard = ({ item, onPress }: SpecieCardProps) => {
-    
-    // Asignación de colores basada en el estado (usando los nombres de tu paleta)
-    const bgColor = item.isCritical ? AppColors.DARK_COLOR : AppColors.WHITE;
-    const titleColor = item.isCritical ? AppColors.WHITE : AppColors.DARK_COLOR;
-    const subColor = AppColors.TEXT_GRAY; 
-    
-    // Usamos el color de acento (SECUNDARY_COLOR) para la etiqueta, 
-    // y el primario (PRIMARY_COLOR) si es crítico (para el fondo oscuro)
-    const tagColor = item.isCritical ? AppColors.PRIMARY_COLOR : AppColors.SECUNDARY_COLOR; 
+    const isDark = item.isCritical;
+    const bgColor = isDark ? AppColors.DARK_COLOR : AppColors.WHITE;
+    const titleColor = isDark ? AppColors.WHITE : AppColors.DARK_COLOR;
+    const subColor = isDark ? '#A0A0A0' : AppColors.TEXT_GRAY; 
+    const tagColor = isDark ? AppColors.PRIMARY_COLOR : AppColors.SECUNDARY_COLOR; 
 
     return (
         <TouchableOpacity 
+            activeOpacity={0.7}
             style={[styles.cardContainer, { backgroundColor: bgColor }]}
             onPress={onPress}
         >
-            <View style={styles.imagePlaceholder}>
+            <View style={styles.imageContainer}>
                 <Image 
                     source={{ uri: item.imageUrl }} 
-                    style={[styles.imageStyle, { backgroundColor: item.color }]} 
+                    style={[styles.imageStyle, { backgroundColor: item.color || AppColors.LIGHT_COLOR }]} 
                     resizeMode="cover"
-                    onError={(e) => console.log('Image Error:', e.nativeEvent.error)}
                 />
             </View>
 
             <View style={styles.contentArea}>
-                {/* Tag de Etapa */}
                 <View style={[styles.stagePill, { backgroundColor: tagColor }]}>
                     <Text style={styles.stageText}>{item.stage}</Text>
                 </View>
-
-                {/* Título, Subtítulo y Zona */}
-                <Text style={[styles.nameText, { color: titleColor }]}>
+                <Text style={[styles.nameText, { color: titleColor }]} numberOfLines={1}>
                     {item.name}
-                </Text>
-                <Text style={[styles.countText, { color: subColor }]}>
-                    {item.count} plantas | Zona: {item.zone.slice(-1)}
-                </Text>
+                </Text>                
+                <View style={styles.detailsRow}>
+                    <Text style={[styles.countText, { color: subColor }]}>
+                        {item.count} ejemplares
+                    </Text>
+                    <View style={styles.dotSeparator} />
+                    <Text style={[styles.zoneText, { color: subColor }]}>
+                        {item.zone}
+                    </Text>
+                </View>
             </View>
-
-            {/* Flecha de Navegación */}
-            <Ionicons name="chevron-forward-outline" size={24} color={subColor} />
+            <View style={styles.actionArea}>
+                <Ionicons 
+                    name="chevron-forward-outline" 
+                    size={20} 
+                    color={isDark ? AppColors.WHITE : AppColors.TEXT_GRAY} 
+                />
+            </View>
         </TouchableOpacity>
     );
 };
@@ -74,25 +60,22 @@ const SpecieCard = ({ item, onPress }: SpecieCardProps) => {
 export default SpecieCard;
 
 const styles = StyleSheet.create({
-    // --- Estilos de la Tarjeta (Específicos para este componente) ---
     cardContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 15,
-        borderRadius: 12,
-        marginBottom: 15,
-        shadowColor: AppColors.BLACK,
+        padding: 12,
+        borderRadius: 16,
+        marginBottom: 12,
+        shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-        // IMPORTANTE: Asegúrate de que el contenedor principal de la lista
-        // (el ScrollView) tenga el paddingHorizontal, no esta tarjeta.
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 2,
     },
-    imagePlaceholder: {
-        width: 60,
-        height: 60,
-        borderRadius: 8,
+    imageContainer: {
+        width: 65,
+        height: 65,
+        borderRadius: 12,
         marginRight: 15,
         overflow: 'hidden',
     },
@@ -102,31 +85,47 @@ const styles = StyleSheet.create({
     },
     contentArea: {
         flex: 1,
+        justifyContent: 'center',
     },
-
-    // --- Estilos de la Etapa (Tag) ---
     stagePill: {
         paddingHorizontal: 8,
         paddingVertical: 3,
-        borderRadius: 5,
+        borderRadius: 6,
         alignSelf: 'flex-start',
-        marginBottom: 5,
+        marginBottom: 4,
     },
     stageText: {
-        fontSize: 10,
-        fontWeight: '700',
+        fontSize: 9,
+        fontWeight: '800',
         color: AppColors.WHITE,
         textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
-
-    // --- Estilos de Texto ---
     nameText: {
-        fontSize: 18,
-        fontWeight: '700',
+        fontSize: 17,
+        fontWeight: 'bold',
+        marginBottom: 2,
+    },
+    detailsRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     countText: {
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: '500',
-        marginTop: 2,
+    },
+    zoneText: {
+        fontSize: 13,
+        fontWeight: '600',
+    },
+    dotSeparator: {
+        width: 4,
+        height: 4,
+        borderRadius: 2,
+        backgroundColor: '#D1D1D1',
+        marginHorizontal: 8,
+    },
+    actionArea: {
+        marginLeft: 10,
     }
 });

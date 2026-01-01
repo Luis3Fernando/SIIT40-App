@@ -1,1 +1,0 @@
-// parsea JSON que envía el ESP32

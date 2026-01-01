@@ -1,106 +1,76 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Dimensions } from 'react-native';
 import { AppColors } from '@theme/Colors'; 
 import SpecieCard from '@components/SpecieCard';
-
-type PlantStage = 'Reproductivo' | 'Crecimiento' | 'Maduración';
-type PlantZone = 'Zona A' | 'Zona B' | 'Zona C';
-
-interface PlantData {
-    id: number;
-    name: string;
-    scientificName: string;
-    count: number;
-    stage: PlantStage;
-    zone: PlantZone;
-    isCritical: boolean;
-    imageUrl: string;
-    color: string;
-}
-
-const mockSpecies: PlantData[] = [
-    {
-        id: 1, name: 'Tomate', scientificName: 'Solanum lycopersicum', count: 120,
-        stage: 'Reproductivo', zone: 'Zona A', isCritical: false,
-        imageUrl: 'https://placehold.co/60x60/FF6347/FFFFFF?text=T', color: AppColors.PRIMARY_COLOR,
-    },
-    {
-        id: 2, name: 'Maíz', scientificName: 'Zea mays', count: 150,
-        stage: 'Crecimiento', zone: 'Zona B', isCritical: false,
-        imageUrl: 'https://placehold.co/60x60/FBC02D/FFFFFF?text=M', color: AppColors.LIGHT_COLOR,
-    },
-    {
-        id: 3, name: 'Maní', scientificName: 'Arachis hypogaea', count: 95,
-        stage: 'Maduración', zone: 'Zona A', isCritical: true,
-        imageUrl: 'https://placehold.co/60x60/083731/FFFFFF?text=P', color: AppColors.DARK_COLOR,
-    },
-    {
-        id: 4, name: 'Pimiento', scientificName: 'Capsicum', count: 60,
-        stage: 'Reproductivo', zone: 'Zona B', isCritical: false,
-        imageUrl: 'https://placehold.co/60x60/FFD700/FFFFFF?text=P', color: AppColors.PRIMARY_COLOR,
-    },
-    {
-        id: 5, name: 'Papa', scientificName: 'Solanum tuberosum', count: 70,
-        stage: 'Crecimiento', zone: 'Zona B', isCritical: true,
-        imageUrl: 'https://placehold.co/60x60/C0C0C0/333333?text=P', color: AppColors.LIGHT_COLOR,
-    },
-];
+import { usePlants } from '@custom-hooks/logic/usePlants';
+import { PlantZone } from '@models/PlantData';
+import { Ionicons } from '@expo/vector-icons';
 
 const ListSpecies = () => {
+    const { plants, loading } = usePlants();
     const [activeTab, setActiveTab] = useState<'Todo' | PlantZone>('Todo'); 
     const tabs: Array<'Todo' | PlantZone> = ['Todo', 'Zona A', 'Zona B'];
-    const filteredSpecies = mockSpecies.filter(plant => {
-        if (activeTab === 'Todo') {
-            return true;
-        }
+
+    const filteredSpecies = plants.filter(plant => {
+        if (activeTab === 'Todo') return true;
         return plant.zone === activeTab;
     });
-    const renderTabHeader = () => (
-        <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            style={styles.tabHeaderContainer}
-        >
-            {tabs.map((tab) => {
-                const isActive = activeTab === tab;
-                const tabColor = isActive ? AppColors.DARK_COLOR : AppColors.TEXT_GRAY;
-                const tabBorderColor = isActive ? AppColors.PRIMARY_COLOR : 'transparent';
 
-                return (
-                    <TouchableOpacity 
-                        key={tab}
-                        style={styles.tabPill}
-                        onPress={() => setActiveTab(tab)}
-                    >
-                        <Text style={[styles.tabText, { color: tabColor }]}>
-                            {tab}
-                        </Text>
-                        {/* Indicador de línea activa */}
-                        <View style={[styles.tabIndicator, { backgroundColor: tabBorderColor }]} />
-                    </TouchableOpacity>
-                );
-            })}
-        </ScrollView>
+    const renderTabHeader = () => (
+        <View style={styles.tabHeaderContainer}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {tabs.map((tab) => {
+                    const isActive = activeTab === tab;
+                    return (
+                        <TouchableOpacity 
+                            key={tab} 
+                            style={styles.tabPill} 
+                            onPress={() => setActiveTab(tab)}
+                        >
+                            <Text style={[
+                                styles.tabText, 
+                                { color: isActive ? AppColors.PRIMARY_COLOR : AppColors.TEXT_GRAY }
+                            ]}>
+                                {tab}
+                            </Text>
+                            {isActive && <View style={styles.tabIndicator} />}
+                        </TouchableOpacity>
+                    );
+                })}
+            </ScrollView>
+        </View>
     );
+
+    if (loading) {
+        return (
+            <View style={styles.centerContainer}>
+                <ActivityIndicator color={AppColors.PRIMARY_COLOR} size="large" />
+            </View>
+        );
+    }
 
     return (
         <View style={styles.listContainer}>
-            {/* Cabecera de Pestañas */}
             {renderTabHeader()}
 
-            {/* Lista Filtrada de Especies */}
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 {filteredSpecies.length > 0 ? (
                     filteredSpecies.map((species) => (
-                        // USO DEL COMPONENTE MODULARIZADO (SpecieCard)
                         <SpecieCard 
                             key={species.id} 
                             item={species} 
-                            onPress={() => console.log('Navegar a detalles de:', species.name)}
+                            onPress={() => console.log('Navegar a detalles:', species.name)}
                         />
                     ))
                 ) : (
-                    <Text style={styles.emptyText}>No hay plantas registradas en la {activeTab}.</Text>
+                    <View style={styles.emptyContainer}>
+                        <Ionicons name="leaf-outline" size={80} color={AppColors.LIGHT_COLOR} />
+                        <Text style={styles.emptyText}>
+                            {plants.length === 0 
+                                ? "Ninguna planta registrada en el invernadero." 
+                                : `No hay plantas registradas en la ${activeTab}.`}
+                        </Text>
+                    </View>
                 )}
             </ScrollView>
         </View>
@@ -114,42 +84,54 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: AppColors.WHITE,
     },
+    centerContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     scrollContent: {
+        flexGrow: 1,
         paddingHorizontal: 20, 
         paddingTop: 10,
+        paddingBottom: 20,
     },
-
-    // --- Estilos de la Cabecera de Tabs ---
     tabHeaderContainer: {
         height: 50,
+        backgroundColor: AppColors.WHITE,
         borderBottomWidth: 1,
-        borderBottomColor: AppColors.LIGHT_COLOR,
+        borderBottomColor: '#F0F0F0',
         paddingLeft: 20,
     },
     tabPill: {
-        marginRight: 20,
+        marginRight: 25,
         height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
     },
     tabText: {
-        fontSize: 16,
-        fontWeight: '600',
+        fontSize: 15,
+        fontWeight: '700',
     },
     tabIndicator: {
         position: 'absolute',
         bottom: 0,
         width: '100%',
         height: 3,
+        backgroundColor: AppColors.PRIMARY_COLOR,
         borderRadius: 2,
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: -50,
     },
     emptyText: {
         textAlign: 'center',
-        marginTop: 50,
+        marginTop: 15,
         fontSize: 16,
         color: AppColors.TEXT_GRAY,
+        lineHeight: 22,
+        paddingHorizontal: 40,
     },
-    // Nota: Los estilos de 'cardContainer', 'imagePlaceholder', etc.,
-    // han sido movidos a SpecieCard.tsx. Mantenemos solo los estilos del contenedor
-    // y del sistema de pestañas aquí.
 });
