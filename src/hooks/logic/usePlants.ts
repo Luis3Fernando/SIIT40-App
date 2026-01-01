@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDispatch, useSelector } from 'react-redux'; // Redux hooks
+import { useDispatch, useSelector } from 'react-redux'; 
 import { RootState } from '@redux/store';
 import { setInventory, addPlantToInventory } from '@redux/slices/plantsSlice';
 import { PlantData } from '@models/PlantData';
