@@ -6,6 +6,7 @@ import {
   GetConfigResponseDTO,
   ListFilesResponseDTO,
 } from "@adapters/esp32DTOs";
+import { StatusResponse } from "@models/StatusEsp32";
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: ESP32_CONFIG.BASE_URL,
@@ -99,6 +100,17 @@ export const esp32Service = {
         {
           params: { file: fileName },
         }
+      );
+      return data;
+    } catch (error) {
+      return handleAxiosError(error);
+    }
+  },
+
+  fetchHardwareStatus: async (): Promise<StatusResponse | AppFailure> => {
+    try {
+      const { data } = await apiClient.get<StatusResponse>(
+        ESP32_CONFIG.ENDPOINTS.STATUS
       );
       return data;
     } catch (error) {
