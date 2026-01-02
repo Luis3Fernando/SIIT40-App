@@ -19,6 +19,8 @@ import { useEsp32Status } from "@custom-hooks/logic/useEsp32Status";
 import { ESP32_CONFIG } from "@config/esp32";
 import { useIrrigationSettings } from "@custom-hooks/logic/useIrrigationSettings";
 import { formatTime } from "@utils/time";
+import { useResetDevice } from "@custom-hooks/logic/useResetDevice";
+import { useConnectionGuard } from "@custom-hooks/logic/useConnectionGuard";
 
 const ConnectionScreen = () => {
   const {
@@ -29,7 +31,7 @@ const ConnectionScreen = () => {
     STATUS_DANGER,
     STATUS_SUCCESS,
   } = AppColors;
-
+  const { isConnected } = useConnectionGuard();
   const { isConnectedToGateway, isApiReachable, currentSSID } = useSelector(
     (state: RootState) => state.connection
   );
@@ -40,6 +42,7 @@ const ConnectionScreen = () => {
     loading: loadingCfg,
     refetch: refetchCfg,
   } = useIrrigationSettings();
+  const { triggerReset, isResetting } = useResetDevice();
 
   useEffect(() => {
     if (isConnectedToGateway) {
@@ -277,6 +280,19 @@ const ConnectionScreen = () => {
           )}
         </View>
 
+          <TouchableOpacity 
+          style={[styles.inputSection, { marginTop: 10, borderColor: STATUS_DANGER, borderWidth: 1 }]}
+          onPress={triggerReset}
+          disabled={!isConnected || isResetting}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 10 }}>
+            <Ionicons name="refresh-circle" size={24} color={STATUS_DANGER} />
+            <Text style={{ color: STATUS_DANGER, fontWeight: 'bold', marginLeft: 10 }}>
+              {isResetting ? "Reiniciando..." : "Reiniciar ESP32"}
+            </Text>
+          </View>
+        </TouchableOpacity>
+
         {!isApiReachable && (
           <TouchableOpacity
             style={styles.helpButton}
@@ -509,5 +525,15 @@ const styles = StyleSheet.create({
     color: AppColors.PRIMARY_COLOR,
     fontWeight: "700",
     marginLeft: 10,
+  },
+  inputSection: {
+    flexDirection: "row",
+    backgroundColor: "#F9F9F9",
+    padding: 15,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderWidth: 1,
+    borderColor: "#EEE",
   },
 });

@@ -118,3 +118,24 @@ export const esp32Service = {
     }
   },
 };
+
+export const resetDevice = async (): Promise<boolean> => {
+  try {
+    const response = await fetch(`${ESP32_CONFIG.BASE_URL}${ESP32_CONFIG.ENDPOINTS.RESET}`);
+    return response.ok;
+  } catch (error) {
+    return false;
+  }
+};
+
+export const setZoneStatus = async (id: 'A' | 'B', active: boolean): Promise<boolean> => {
+  try {
+    const actParam = active ? 1 : 0;
+    const url = `${ESP32_CONFIG.BASE_URL}${ESP32_CONFIG.ENDPOINTS.SET_CONFIG}?id=${id}&act=${actParam}`;
+    const response = await fetch(url);
+    return response.ok;
+  } catch (error) {
+    console.error("Error al cambiar estado de zona:", error);
+    return false;
+  }
+};

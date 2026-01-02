@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useConnectionGuard } from "@custom-hooks/logic/useConnectionGuard";
 import { useRealTimeStatus } from "@custom-hooks/logic/useRealTimeStatus";
 import { useIrrigationControl } from "@custom-hooks/logic/useIrrigationControl";
+import { useZoneControl } from "@custom-hooks/logic/useZoneControl";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 60) / 2;
@@ -38,6 +39,8 @@ const ControlScreen = () => {
   const { startIrrigation, stopIrrigation, isProcessing } =
     useIrrigationControl();
 
+  const controlZonaA = useZoneControl("A", true);
+  const controlZonaB = useZoneControl("B", true);
   const getZoneData = (zone: "A" | "B") => {
     const remoteData = valves.find((v) => v.zone === zone) || {
       isOpen: false,
@@ -198,6 +201,27 @@ const ControlScreen = () => {
             zoneB.isOpen,
             isConnected,
             () => handleToggle("B", zoneB.isOpen)
+          )}
+        </View>
+
+        <Text style={styles.sectionTitle}>Gestión de Zonas (Auto)</Text>
+        <View style={styles.controlGrid}>
+          {renderActuatorCard(
+            "Auto Zona A",
+            controlZonaA.isActive ? "Programa Activo" : "Zona Desactivada",
+            controlZonaA.isActive ? "checkmark-circle" : "power",
+            controlZonaA.isActive,
+            isConnected,
+            () => controlZonaA.toggleStatus()
+          )}
+
+          {renderActuatorCard(
+            "Auto Zona B",
+            controlZonaB.isActive ? "Programa Activo" : "Zona Desactivada",
+            controlZonaB.isActive ? "checkmark-circle" : "power",
+            controlZonaB.isActive,
+            isConnected,
+            () => controlZonaB.toggleStatus()
           )}
         </View>
 
