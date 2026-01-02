@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "SIIT40-App",
-    "slug": "SIIT40-App",
+    "name": "SIIT40",
+    "slug": "SIIT40",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
@@ -30,6 +30,12 @@
     "plugins": [
       "expo-router",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "6a856c41-820d-4079-b95e-43aa1f43d082"
+      }
+    }
   }
 }
